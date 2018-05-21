@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(TgBot)
+set(CMAKE_CXX_STANDARD 11)
 
 ### options
 option(ENABLE_TESTS "Set to ON to enable building of tests" OFF)
 
 ### sources
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-include_directories(include)
 set(SRC_LIST
 	src/Api.cpp
 	src/TgTypeParser.cpp
@@ -47,6 +46,12 @@ set(LIB_LIST
 
 ### building project
 add_library(${PROJECT_NAME} ${SRC_LIST})
+if(UNIX)
+	target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+elseif(MSVC)
+	target_compile_options(${PROJECT_NAME} PRIVATE "/W4")
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} ${LIB_LIST})
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
