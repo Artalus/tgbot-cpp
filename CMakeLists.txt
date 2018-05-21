@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.8.4)
 project(TgBot)
 set(CMAKE_CXX_STANDARD 11)
 
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+set(CMAKE_MODULE_PATH ${CONAN_CMAKE_MODULE_PATH} ${CMAKE_MODULE_PATH})
+
+
 ### options
 option(ENABLE_TESTS "Set to ON to enable building of tests" OFF)
 
@@ -21,28 +26,17 @@ set(SRC_LIST
 	src/types/InputFile.cpp
 )
 
-### libs
-# threads
-find_package(Threads REQUIRED)
-
-# openssl
-find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})
-
-# boost
-set(Boost_USE_MULTITHREADED ON)
-if (ENABLE_TESTS)
-	find_package(Boost 1.59.0 COMPONENTS system unit_test_framework REQUIRED)
-else()
-	find_package(Boost 1.59.0 COMPONENTS system REQUIRED)
-endif()
-include_directories(${Boost_INCLUDE_DIR})
 
 set(LIB_LIST
-	${CMAKE_THREAD_LIBS_INIT}
-	${OPENSSL_LIBRARIES}
-	${Boost_LIBRARIES}
+	CONAN_PKG::boost_system
+	CONAN_PKG::boost_property_tree
+	CONAN_PKG::OpenSSL
 )
+set(Boost_USE_MULTITHREADED ON)
+if (ENABLE_TESTS)
+	set(LIB_LIST ${LIB_LIST} CONAN_PKG::boost_test)
+endif()
+
 
 ### building project
 add_library(${PROJECT_NAME} ${SRC_LIST})
