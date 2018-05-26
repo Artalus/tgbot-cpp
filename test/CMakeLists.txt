@@ -5,7 +5,12 @@ set(TEST_SRC_LIST
 	tgbot/tools/StringTools.cpp
 )
 
-include_directories("${PROJECT_SOURCE_DIR}/test")
-add_executable(${PROJECT_NAME}_test ${TEST_SRC_LIST})
-target_link_libraries(${PROJECT_NAME}_test TgBot)
-add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)
+set(TEST_NAME ${PROJECT_NAME}_test)
+
+add_executable(${TEST_NAME} ${TEST_SRC_LIST})
+target_include_directories(${TEST_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/test)
+target_link_libraries(${TEST_NAME}
+	TgBot
+	CONAN_PKG::boost_test
+)
+add_test(${TEST_NAME} ${TEST_NAME})
