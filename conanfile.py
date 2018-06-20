@@ -7,7 +7,7 @@ import os
 import shutil
 
 
-class LibnameConan(ConanFile):
+class TgbotConan(ConanFile):
     name = "tgbot_cpp"
     version = "20180620"
 

@@ -10,3 +10,4 @@ doc/
 *.a
 test/TgBot_test
 .vscode/
+test_package/build
