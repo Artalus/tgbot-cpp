@@ -30,6 +30,7 @@ set(SRC_LIST
 set(LIB_LIST
 	CONAN_PKG::boost_system
 	CONAN_PKG::boost_property_tree
+	CONAN_PKG::boost_asio
 	CONAN_PKG::OpenSSL
 )
 set(Boost_USE_MULTITHREADED ON)
