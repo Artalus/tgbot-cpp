@@ -32,7 +32,8 @@
 namespace TgBot {
 
 /**
- * This class handles HTTP requests from the Internet.
+ * @brief This class handles HTTP requests from the Internet.
+ * 
  * @ingroup net
  */
 template<typename Protocol>
@@ -42,17 +43,17 @@ protected:
 	class Connection;
 
 public:
-	typedef std::function<std::string (const std::string&, const std::map<std::string, std::string>)> ServerHandler;
+	typedef std::function<std::string (const std::string&, const std::unordered_map<std::string, std::string>)> ServerHandler;
 
 	HttpServer(std::shared_ptr<boost::asio::basic_socket_acceptor<Protocol>> acceptor, const ServerHandler& handler) : _acceptor(acceptor), _handler(handler) {
 	}
 
 	/**
-	 * Starts receiving new connections.
+	 * @brief Starts receiving new connections.
 	 */
 	void start() {
-		std::shared_ptr<boost::asio::basic_stream_socket<Protocol>> socket(new boost::asio::basic_stream_socket<Protocol>(_acceptor->get_io_service()));
-		std::shared_ptr<Connection> connection(new Connection(socket, _handler));
+		auto socket(std::make_shared<boost::asio::basic_stream_socket<Protocol>>(_acceptor->get_io_service()));
+		auto connection(std::make_shared<Connection>(socket, _handler));
 		_acceptor->async_accept(*connection->socket, [this, connection]() {
 			connection->start();
 			start();
@@ -61,7 +62,7 @@ public:
 	}
 
 	/**
-	 * Stops receiving new connections.
+	 * @brief Stops receiving new connections.
 	 */
 	void stop() {
 		_ioService.stop();
@@ -79,7 +80,7 @@ protected:
 		void start() {
 			data.reserve(10240);
 			socket->async_receive(data, [this]() {
-				std::map<std::string, std::string> headers;
+				std::unordered_map<std::string, std::string> headers;
 				std::string body = HttpParser::getInstance().parseResponse(data, headers);
 				socket->async_send(_handler(body, headers));
 			});

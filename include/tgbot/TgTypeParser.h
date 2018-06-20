@@ -35,7 +35,10 @@
 #include "tgbot/types/Audio.h"
 #include "tgbot/types/Document.h"
 #include "tgbot/types/Sticker.h"
+#include "tgbot/types/StickerSet.h"
+#include "tgbot/types/MaskPosition.h"
 #include "tgbot/types/Video.h"
+#include "tgbot/types/VideoNote.h"
 #include "tgbot/types/Contact.h"
 #include "tgbot/types/Location.h"
 #include "tgbot/types/Update.h"
@@ -46,6 +49,7 @@
 #include "tgbot/types/ReplyKeyboardRemove.h"
 #include "tgbot/types/ForceReply.h"
 #include "tgbot/types/ChatMember.h"
+#include "tgbot/types/ChatPhoto.h"
 #include "tgbot/types/ResponseParameters.h"
 #include "tgbot/types/GenericReply.h"
 #include "tgbot/types/InlineQuery.h"
@@ -71,6 +75,10 @@
 #include "tgbot/types/InlineQueryResultVideo.h"
 #include "tgbot/types/InlineQueryResultVoice.h"
 #include "tgbot/types/ChosenInlineResult.h"
+#include "tgbot/types/CallbackGame.h"
+#include "tgbot/types/Animation.h"
+#include "tgbot/types/Game.h"
+#include "tgbot/types/GameHighScore.h"
 #include "tgbot/types/CallbackQuery.h"
 #include "tgbot/types/InlineKeyboardMarkup.h"
 #include "tgbot/types/InlineKeyboardButton.h"
@@ -80,6 +88,17 @@
 #include "tgbot/types/InputLocationMessageContent.h"
 #include "tgbot/types/InputVenueMessageContent.h"
 #include "tgbot/types/InputContactMessageContent.h"
+#include "tgbot/types/Invoice.h"
+#include "tgbot/types/OrderInfo.h"
+#include "tgbot/types/PreCheckoutQuery.h"
+#include "tgbot/types/ShippingAddress.h"
+#include "tgbot/types/ShippingQuery.h"
+#include "tgbot/types/ShippingOption.h"
+#include "tgbot/types/SuccessfulPayment.h"
+#include "tgbot/types/LabeledPrice.h"
+#include "tgbot/types/InputMedia.h"
+#include "tgbot/types/InputMediaPhoto.h"
+#include "tgbot/types/InputMediaVideo.h"
 
 namespace TgBot {
 
@@ -98,7 +117,8 @@ public:
 	std::string parseChat(const Chat::Ptr& object) const;
 	User::Ptr parseJsonAndGetUser(const boost::property_tree::ptree& data) const;
 	std::string parseUser(const User::Ptr& object) const;
-	MessageEntity::Ptr parseJsonAndGetEntity(const boost::property_tree::ptree& data) const;
+	MessageEntity::Ptr parseJsonAndGetMessageEntity(const boost::property_tree::ptree& data) const;
+	std::string parseMessageEntity(const MessageEntity::Ptr& object) const;
 	Message::Ptr parseJsonAndGetMessage(const boost::property_tree::ptree& data) const;
 	std::string parseMessage(const Message::Ptr& object) const;
 	PhotoSize::Ptr parseJsonAndGetPhotoSize(const boost::property_tree::ptree& data) const;
@@ -109,8 +129,20 @@ public:
 	std::string parseDocument(const Document::Ptr& object) const;
 	Sticker::Ptr parseJsonAndGetSticker(const boost::property_tree::ptree& data) const;
 	std::string parseSticker(const Sticker::Ptr& object) const;
+	StickerSet::Ptr parseJsonAndGetStickerSet(const boost::property_tree::ptree& data) const;
+	std::string parseStickerSet(const StickerSet::Ptr& object) const;
+	MaskPosition::Ptr parseJsonAndGetMaskPosition(const boost::property_tree::ptree& data) const;
+	std::string parseMaskPosition(const MaskPosition::Ptr& object) const;
 	Video::Ptr parseJsonAndGetVideo(const boost::property_tree::ptree& data) const;
 	std::string parseVideo(const Video::Ptr& object) const;
+	VideoNote::Ptr parseJsonAndGetVideoNote(const boost::property_tree::ptree& data) const;
+	std::string parseVideoNote(const VideoNote::Ptr& object) const;
+	Game::Ptr parseJsonAndGetGame(const boost::property_tree::ptree& data) const;
+	std::string parseGame(const Game::Ptr& object) const;
+	GameHighScore::Ptr parseJsonAndGetGameHighScore(const boost::property_tree::ptree& data) const;
+	std::string parseGameHighScore(const GameHighScore::Ptr& object) const;
+	Animation::Ptr parseJsonAndGetAnimation(const boost::property_tree::ptree& data) const;
+	std::string parseAnimation(const Animation::Ptr& object) const;
 	Contact::Ptr parseJsonAndGetContact(const boost::property_tree::ptree& data) const;
 	std::string parseContact(const Contact::Ptr& object) const;
 	Location::Ptr parseJsonAndGetLocation(const boost::property_tree::ptree& data) const;
@@ -119,6 +151,8 @@ public:
 	std::string parseUpdate(const Update::Ptr& object) const;
 	UserProfilePhotos::Ptr parseJsonAndGetUserProfilePhotos(const boost::property_tree::ptree& data) const;
 	std::string parseUserProfilePhotos(const UserProfilePhotos::Ptr& object) const;
+	InputMedia::Ptr parseJsonAndGetInputMedia(const boost::property_tree::ptree& data) const;
+	std::string parseInputMedia(const InputMedia::Ptr& object) const;
 
 	File::Ptr parseJsonAndGetFile(const boost::property_tree::ptree& data) const;
 	std::string parseFile(const File::Ptr& object) const;
@@ -137,6 +171,9 @@ public:
 
 	ChatMember::Ptr parseJsonAndGetChatMember(const boost::property_tree::ptree& data) const;
 	std::string parseChatMember(const ChatMember::Ptr& object) const;
+
+	ChatPhoto::Ptr parseJsonAndGetChatPhoto(const boost::property_tree::ptree& data) const;
+	std::string parseChatPhoto(const ChatPhoto::Ptr& object) const;
 
 	ResponseParameters::Ptr parseJsonAndGetResponseParameters(const boost::property_tree::ptree& data) const;
 	std::string parseResponseParameters(const ResponseParameters::Ptr& object) const;
@@ -234,6 +271,30 @@ public:
 	InputContactMessageContent::Ptr parseJsonAndGetInputContactMessageContent(const boost::property_tree::ptree& data) const;
 	std::string parseInputContactMessageContent(const InputContactMessageContent::Ptr& object) const;
 
+	Invoice::Ptr parseJsonAndGetInvoice(const boost::property_tree::ptree& data) const;
+	std::string parseInvoice(const Invoice::Ptr& object) const;
+
+	LabeledPrice::Ptr parseJsonAndGetLabeledPrice(const boost::property_tree::ptree& data) const;
+	std::string parseLabeledPrice(const LabeledPrice::Ptr& object) const;
+
+	OrderInfo::Ptr parseJsonAndGetOrderInfo(const boost::property_tree::ptree& data) const;
+	std::string parseOrderInfo(const OrderInfo::Ptr& object) const;
+
+	PreCheckoutQuery::Ptr parseJsonAndGetPreCheckoutQuery(const boost::property_tree::ptree& data) const;
+	std::string parsePreCheckoutQuery(const PreCheckoutQuery::Ptr& object) const;
+
+	ShippingAddress::Ptr parseJsonAndGetShippingAddress(const boost::property_tree::ptree& data) const;
+	std::string parseShippingAddress(const ShippingAddress::Ptr& object) const;
+
+	ShippingOption::Ptr parseJsonAndGetShippingOption(const boost::property_tree::ptree& data) const;
+	std::string parseShippingOption(const ShippingOption::Ptr& object) const;
+
+	ShippingQuery::Ptr parseJsonAndGetShippingQuery(const boost::property_tree::ptree& data) const;
+	std::string parseShippingQuery(const ShippingQuery::Ptr& object) const;
+
+	SuccessfulPayment::Ptr parseJsonAndGetSucessfulPayment(const boost::property_tree::ptree& data) const;
+	std::string parseSucessfulPayment(const SuccessfulPayment::Ptr& object) const;
+
 	inline boost::property_tree::ptree parseJson(const std::string& json) const {
 		boost::property_tree::ptree tree;
 		std::istringstream input(json);
@@ -253,6 +314,7 @@ public:
 	template<typename T>
 	std::vector<std::shared_ptr<T>> parseJsonAndGetArray(JsonToTgTypeFunc<T> parseFunc, const boost::property_tree::ptree& data) const {
 		std::vector<std::shared_ptr<T>> result;
+		result.reserve(data.size());
 		for (const std::pair<const std::string, boost::property_tree::ptree>& innerTreeItem : data) {
 			result.push_back((this->*parseFunc)(innerTreeItem.second));
 		}
@@ -266,6 +328,7 @@ public:
 		if (treeItem == data.not_found()) {
 			return result;
 		}
+		result.reserve(treeItem->second.size());
 		for (const std::pair<const std::string, boost::property_tree::ptree>& innerTreeItem : treeItem->second) {
 			result.push_back(parseFunc(innerTreeItem.second));
 		}
@@ -279,6 +342,7 @@ public:
 		if (treeItem == data.not_found()) {
 			return result;
 		}
+		result.reserve(treeItem->second.size());
 		for (const std::pair<const std::string, boost::property_tree::ptree>& innerTreeItem : treeItem->second) {
 			result.push_back((this->*parseFunc)(innerTreeItem.second));
 		}
@@ -292,6 +356,7 @@ public:
 		if (treeItem == data.not_found()) {
 			return result;
 		}
+		result.reserve(treeItem->second.size());
 		for (const std::pair<const std::string, boost::property_tree::ptree>& innerTreeItem : treeItem->second) {
 			std::vector<std::shared_ptr<T>> innerResult;
 			for (const std::pair<const std::string, boost::property_tree::ptree>& innerInnerTreeItem : innerTreeItem.second) {

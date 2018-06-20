@@ -29,7 +29,8 @@
 namespace TgBot {
 
 /**
- * This object represents a Telegram user or bot.
+ * @brief This object represents a Telegram user or bot.
+ * 
  * @ingroup types
  */
 class User  {
@@ -38,24 +39,34 @@ public:
 	typedef std::shared_ptr<User> Ptr;
 
 	/**
-	 * Unique identifier for this user or bot.
+	 * @brief Unique identifier for this user or bot.
 	 */
 	int32_t id;
 
 	/**
-	 * User‘s or bot’s first name.
+	 * @brief True, if this user is a bot
+	 */
+	bool isBot = false;
+
+	/**
+	 * @brief User‘s or bot’s first name.
 	 */
 	std::string firstName;
 
 	/**
-	 * Optional. User‘s or bot’s last name.
+	 * @brief Optional. User‘s or bot’s last name.
 	 */
 	std::string lastName;
 
 	/**
-	 * Optional. User‘s or bot’s username.
+	 * @brief Optional. User‘s or bot’s username.
 	 */
 	std::string username;
+
+	/**
+	 * @brief Optional. IETF language tag of the user's language.
+	 */
+	std::string languageCode;
 };
 
 }
