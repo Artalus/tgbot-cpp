@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CONAN_CMAKE_MODULE_PATH} ${CMAKE_MODULE_PATH})
 
 ### options
 option(ENABLE_TESTS "Set to ON to enable building of tests" OFF)
+option(BUILD_SHARED_LIBS "Build tgbot-cpp shared/static library." OFF)
 
 ### sources
 set(SRC_LIST
