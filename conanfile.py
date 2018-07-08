@@ -24,26 +24,33 @@ class TgbotConan(ConanFile):
 
     # Options may need to change depending on the packaged library.
     settings = "os", "arch", "compiler", "build_type"
-#    options = {"shared": [True, False], "fPIC": [True, False]}
-#    default_options = "shared=False", "fPIC=True"
+    options = { "useCurl": [True, False], "fPIC": [True, False] }
+    default_options = "useCurl=True", "fPIC=True"
 
-    bv = '1.65.1'
+    bv = "1.65.1"
     requires = (
-        'boost_system/%s@bincrafters/stable' % bv,
-        'boost_asio/%s@bincrafters/stable' % bv,
-        'boost_property_tree/%s@bincrafters/stable' % bv,
-        'OpenSSL/[>=1.0,<1.1]@conan/stable'
+        "boost_system/%s@bincrafters/stable" % bv,
+        "boost_asio/%s@bincrafters/stable" % bv,
+        "boost_property_tree/%s@bincrafters/stable" % bv,
+        "OpenSSL/[>=1.0,<1.1]@conan/stable",
     )
+    requires_opt = { "curl": "libcurl/[>=7.21]@bincrafters/stable" }
 
     def config_options(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             del self.options.fPIC
 
     def configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["ENABLE_TESTS"] = False # example
+        cmake.definitions["ENABLE_TESTS"] = False
+        if self.options.useCurl:
+            cmake.definitions["HAVE_CURL"] = True
         cmake.configure()
         return cmake
+
+    def requirements(self):
+        if self.options.useCurl:
+            self.requires(self.requires_opt["curl"])
 
     def build(self):
         cmake = self.configure_cmake()

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015 Oleg Morozenkov
+ * Copyright (c) 2018 Egor Pugin
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +31,12 @@ using namespace boost::asio::ip;
 
 namespace TgBot {
 
-HttpClient& HttpClient::getInstance() {
-	static HttpClient result;
+BoostHttpClient& BoostHttpClient::getInstance() {
+	static BoostHttpClient result;
 	return result;
 }
 
-string HttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& args) {
+string BoostHttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& args) const {
 	ssl::context context(ssl::context::sslv23);
 	context.set_default_verify_paths();
 
@@ -77,7 +78,7 @@ string HttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& args) {
 	#else
 	char buff[1024];
 	#endif //TGBOT_CHANGE_READ_BUFFER_SIZE
-	
+
 	boost::system::error_code error;
 	while (!error) {
 		size_t bytes = read(socket, buffer(buff), error);
@@ -86,5 +87,76 @@ string HttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& args) {
 
 	return HttpParser::getInstance().parseResponse(response);
 }
+
+#ifdef HAVE_CURL
+
+CurlHttpClient::CurlHttpClient() {
+    curlSettings = curl_easy_init();
+}
+
+CurlHttpClient::~CurlHttpClient() {
+    curl_easy_cleanup(curlSettings);
+}
+
+CurlHttpClient& CurlHttpClient::getInstance() {
+    static CurlHttpClient result;
+    return result;
+}
+
+static size_t curl_write_string(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
+    std::string &s = *(std::string *)userdata;
+    auto read = size * nmemb;
+    s.append(ptr, ptr + read);
+    return read;
+};
+
+string CurlHttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& args) const {
+    // Copy settings for each call because we change CURLOPT_URL and other stuff.
+    // This also protects multithreaded case.
+    auto curl = curl_easy_duphandle(curlSettings);
+
+    auto u = url.protocol + "://" + url.host + url.path;
+    curl_easy_setopt(curl, CURLOPT_URL, u.c_str());
+
+    // disable keep-alive
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Connection: close");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    std::string data;
+    std::vector<char *> escaped;
+    if (!args.empty())
+    {
+        for (auto &a : args)
+        {
+            escaped.push_back(curl_easy_escape(curl, a.name.c_str(), a.name.size()));
+            data += escaped.back() + std::string("=");
+            escaped.push_back(curl_easy_escape(curl, a.value.c_str(), a.value.size()));
+            data += escaped.back() + std::string("&");
+        }
+        data.resize(data.size() - 1);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)data.size());
+    }
+
+    std::string response;
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_string);
+
+    auto res = curl_easy_perform(curl);
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+
+    for (auto &e : escaped)
+        curl_free(e);
+
+    if (res != CURLE_OK)
+        throw std::runtime_error(std::string("curl error: ") + curl_easy_strerror(res));
+
+    return HttpParser::getInstance().parseResponse(response);
+}
+
+#endif
 
 }
