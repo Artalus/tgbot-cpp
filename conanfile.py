@@ -24,8 +24,8 @@ class TgbotConan(ConanFile):
 
     # Options may need to change depending on the packaged library.
     settings = "os", "arch", "compiler", "build_type"
-    options = { "useCurl": [True, False], "fPIC": [True, False] }
-    default_options = "useCurl=True", "fPIC=True"
+    options = { "fPIC": [True, False] }
+    default_options = "fPIC=True",
 
     bv = "1.65.1"
     requires = (
@@ -33,8 +33,8 @@ class TgbotConan(ConanFile):
         "boost_asio/%s@bincrafters/stable" % bv,
         "boost_property_tree/%s@bincrafters/stable" % bv,
         "OpenSSL/[>=1.0,<1.1]@conan/stable",
+        "libcurl/7.56.1@bincrafters/stable"
     )
-    requires_opt = { "curl": "libcurl/[>=7.21]@bincrafters/stable" }
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -43,14 +43,8 @@ class TgbotConan(ConanFile):
     def configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["ENABLE_TESTS"] = False
-        if self.options.useCurl:
-            cmake.definitions["HAVE_CURL"] = True
         cmake.configure()
         return cmake
-
-    def requirements(self):
-        if self.options.useCurl:
-            self.requires(self.requires_opt["curl"])
 
     def build(self):
         cmake = self.configure_cmake()

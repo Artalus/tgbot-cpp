@@ -49,6 +49,7 @@ elseif(MSVC)
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} ${LIB_LIST})
+target_compile_definitions(${PROJECT_NAME} PRIVATE "HAVE_CURL")
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
