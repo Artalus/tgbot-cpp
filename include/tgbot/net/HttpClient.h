@@ -83,13 +83,27 @@ private:
 
 #ifdef HAVE_CURL
 
+class CurlError : public std::runtime_error {
+public:
+    CURLcode code;
+    CurlError(CURLcode code)
+        : std::runtime_error(tostr(code))
+        , code(code)
+    {}
+private:
+    static std::string tostr(CURLcode code) {
+        std::stringstream ss;
+        ss << "curl error: " << code << " " << curl_easy_strerror(code);
+        return ss.str();
+    }
+};
+
 /**
  * @brief This class makes http requests via libcurl.
  *
  * @ingroup net
  */
 class CurlHttpClient : public HttpClient {
-
 public:
 
     /**
@@ -99,6 +113,12 @@ public:
 
     CurlHttpClient();
     ~CurlHttpClient();
+
+
+    /**
+     * @brief Set proxy parameters
+     */
+    void setProxy(std::string host, std::string userpwd = "");
 
     /**
      * @brief Returns instance which lives during all application lifetime.

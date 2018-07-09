@@ -98,6 +98,14 @@ CurlHttpClient::~CurlHttpClient() {
     curl_easy_cleanup(curlSettings);
 }
 
+void CurlHttpClient::setProxy(std::string host, std::string userpwd) {
+    if (!host.empty()) {
+        curl_easy_setopt(curlSettings, CURLOPT_PROXY, host.c_str());
+        if (!userpwd.empty())
+            curl_easy_setopt(curlSettings, CURLOPT_PROXYUSERPWD, userpwd.c_str());
+    }
+}
+
 CurlHttpClient& CurlHttpClient::getInstance() {
     static CurlHttpClient result;
     return result;
@@ -152,7 +160,7 @@ string CurlHttpClient::makeRequest(const Url& url, const vector<HttpReqArg>& arg
         curl_free(e);
 
     if (res != CURLE_OK)
-        throw std::runtime_error(std::string("curl error: ") + curl_easy_strerror(res));
+        throw CurlError(res);
 
     return HttpParser::getInstance().parseResponse(response);
 }

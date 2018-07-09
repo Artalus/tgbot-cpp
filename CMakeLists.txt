@@ -33,6 +33,7 @@ set(LIB_LIST
 	CONAN_PKG::boost_property_tree
 	CONAN_PKG::boost_asio
 	CONAN_PKG::OpenSSL
+	CONAN_PKG::libcurl
 )
 set(Boost_USE_MULTITHREADED ON)
 if (ENABLE_TESTS)
@@ -49,7 +50,7 @@ elseif(MSVC)
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} ${LIB_LIST})
-target_compile_definitions(${PROJECT_NAME} PRIVATE "HAVE_CURL")
+target_compile_definitions(${PROJECT_NAME} PUBLIC "HAVE_CURL")
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
